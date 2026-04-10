@@ -1,4 +1,29 @@
 {
   "version": "",
-  "patches": []
+  "patches": [
+    {
+      "name": "Disable all ads",
+      "description": "Disables all ads including interstitial ads and app open ads. Removes ad loading and display methods.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "dev.dev7.bee": [
+          "86.0.1"
+        ]
+      },
+      "options": []
+    },
+    {
+      "name": "Unlimited connection time",
+      "description": "Removes connection time limits and expiration checks. Allows unlimited VPN connection duration.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "dev.dev7.bee": [
+          "86.0.1"
+        ]
+      },
+      "options": []
+    }
+  ]
 }
