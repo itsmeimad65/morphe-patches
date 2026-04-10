@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "patches": [
     {
       "name": "Disable all ads",
@@ -22,6 +22,18 @@
         "com.example.app": [
           "2.0.0",
           "1.0.2"
+        ]
+      },
+      "options": []
+    },
+    {
+      "name": "Remove ad UI elements",
+      "description": "Removes ADD TIME button, ad banner container, and fixes initial time display. Layout XML already modified.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "dev.dev7.bee": [
+          "86.0.1"
         ]
       },
       "options": []
