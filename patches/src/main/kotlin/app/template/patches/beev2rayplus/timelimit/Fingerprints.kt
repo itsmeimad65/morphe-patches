@@ -1,4 +1,4 @@
-package app.template.patches.beev2rayplus.timelimit
+package app.morphe.patches.beev2rayplus.timelimit
 
 import app.morphe.patcher.Fingerprint
 import com.android.tools.smali.dexlib2.AccessFlags
@@ -23,8 +23,7 @@ object InitConnectionTimerFingerprint : Fingerprint(
 object CountDownTimerOnFinishFingerprint : Fingerprint(
     custom = { method, classDef ->
         method.name == "onFinish" &&
-                method.returnType == "V" &&
-                classDef.type.contains("OpenVPNClient")
+                classDef.superclasses.any { it.type == "Landroid/os/CountDownTimer;" }
     }
 )
 
