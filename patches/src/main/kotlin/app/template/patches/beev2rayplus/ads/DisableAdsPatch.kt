@@ -1,11 +1,9 @@
 package app.template.patches.beev2rayplus.ads
 
-import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
-import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
-import app.morphe.util.returnEarly
 import java.util.logging.Logger
 
 @Suppress("unused")
@@ -25,7 +23,12 @@ val disableAdsPatches = bytecodePatch(
 
         // Patch 1: Disable InterstitialAd loading (d2.java - k() method)
         if (LoadInterstitialAdFingerprint.methodOrNull != null) {
-            LoadInterstitialAdFingerprint.method.returnEarly()
+            LoadInterstitialAdFingerprint.method.addInstructions(
+                0,
+                """
+                    return-void
+                """
+            )
             Logger.getLogger(this::class.java.name)
                 .info("✓ Disabled InterstitialAd loading (d2.k())")
             patchCount++
@@ -36,7 +39,12 @@ val disableAdsPatches = bytecodePatch(
 
         // Patch 2: Disable InterstitialAd display (d2.java - l(Activity) method)
         if (ShowInterstitialAdFingerprint.methodOrNull != null) {
-            ShowInterstitialAdFingerprint.method.returnEarly()
+            ShowInterstitialAdFingerprint.method.addInstructions(
+                0,
+                """
+                    return-void
+                """
+            )
             Logger.getLogger(this::class.java.name)
                 .info("✓ Disabled InterstitialAd display (d2.l())")
             patchCount++
@@ -47,7 +55,12 @@ val disableAdsPatches = bytecodePatch(
 
         // Patch 3: Disable FullScreenContentCallback setup (d2.java - n() method)
         if (SetInterstitialCallbackFingerprint.methodOrNull != null) {
-            SetInterstitialCallbackFingerprint.method.returnEarly()
+            SetInterstitialCallbackFingerprint.method.addInstructions(
+                0,
+                """
+                    return-void
+                """
+            )
             Logger.getLogger(this::class.java.name)
                 .info("✓ Disabled InterstitialAd callback setup (d2.n())")
             patchCount++
@@ -58,7 +71,12 @@ val disableAdsPatches = bytecodePatch(
 
         // Patch 4: Disable AppOpenAd loading (d7.java - l() method)
         if (LoadAppOpenAdFingerprint.methodOrNull != null) {
-            LoadAppOpenAdFingerprint.method.returnEarly()
+            LoadAppOpenAdFingerprint.method.addInstructions(
+                0,
+                """
+                    return-void
+                """
+            )
             Logger.getLogger(this::class.java.name)
                 .info("✓ Disabled AppOpenAd loading (d7.l())")
             patchCount++
@@ -69,7 +87,12 @@ val disableAdsPatches = bytecodePatch(
 
         // Patch 5: Disable AppOpenAd display (d7.java - o() method)
         if (ShowAppOpenAdFingerprint.methodOrNull != null) {
-            ShowAppOpenAdFingerprint.method.returnEarly()
+            ShowAppOpenAdFingerprint.method.addInstructions(
+                0,
+                """
+                    return-void
+                """
+            )
             Logger.getLogger(this::class.java.name)
                 .info("✓ Disabled AppOpenAd display (d7.o())")
             patchCount++
@@ -79,15 +102,14 @@ val disableAdsPatches = bytecodePatch(
         }
 
         // Patch 6: Make ad availability check always return false (d7.java - n() method)
-        // This prevents any ad from being shown
         if (CheckAdAvailabilityFingerprint.methodOrNull != null) {
-            CheckAdAvailabilityFingerprint.method.apply {
-                // Replace method to return false (0)
-                this.replaceInstruction(
-                    this.instructions.lastIndex,
-                    "const/4 v0, 0x0"
-                )
-            }
+            CheckAdAvailabilityFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x0
+                    return v0
+                """
+            )
             Logger.getLogger(this::class.java.name)
                 .info("✓ Disabled ad availability check to always return false (d7.n())")
             patchCount++
@@ -97,15 +119,14 @@ val disableAdsPatches = bytecodePatch(
         }
 
         // Patch 7: Disable ad expiration validation (d7.java - p(long) method)
-        // Make it always return false so ads are considered expired
         if (ValidateAdExpirationFingerprint.methodOrNull != null) {
-            ValidateAdExpirationFingerprint.method.apply {
-                // Replace final return instruction with false
-                this.replaceInstruction(
-                    this.instructions.lastIndex,
-                    "const/4 v0, 0x0"
-                )
-            }
+            ValidateAdExpirationFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x0
+                    return v0
+                """
+            )
             Logger.getLogger(this::class.java.name)
                 .info("✓ Disabled ad expiration validation to always return false (d7.p())")
             patchCount++

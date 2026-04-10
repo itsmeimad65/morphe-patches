@@ -23,7 +23,8 @@ object InitConnectionTimerFingerprint : Fingerprint(
 object CountDownTimerOnFinishFingerprint : Fingerprint(
     custom = { method, classDef ->
         method.name == "onFinish" &&
-                classDef.superclasses.any { it.type == "Landroid/os/CountDownTimer;" }
+                method.returnType == "V" &&
+                classDef.type.contains("OpenVPNClient")
     }
 )
 
