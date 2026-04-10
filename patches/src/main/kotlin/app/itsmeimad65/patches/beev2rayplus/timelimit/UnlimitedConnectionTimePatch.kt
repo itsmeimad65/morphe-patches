@@ -1,6 +1,7 @@
 package app.itsmeimad65.patches.beev2rayplus.timelimit
 
 import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
