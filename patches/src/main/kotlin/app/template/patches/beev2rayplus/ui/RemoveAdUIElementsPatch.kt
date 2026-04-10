@@ -1,82 +1,45 @@
 package app.template.patches.beev2rayplus.ui
 
-import app.morphe.patcher.BytecodePatch
-import app.morphe.patcher.Instruction
-import app.morphe.patcher.classDef
-import app.morphe.patcher.extensions.instruction
-import app.morphe.patcher.extensions.replaceInstruction
-import com.android.tools.smali.dexlib2.Opcode
-import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
-import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.patch.AppTarget
+import app.morphe.patcher.patch.Compatibility
+import app.morphe.patcher.patch.bytecodePatch
+import java.util.logging.Logger
 
 /**
  * Removes ad-related UI elements from Bee V2ray Plus:
- * - Removes "ADD TIME" button that triggers ad watching
- * - Removes ad banner display container
+ * - Removes "ADD TIME" button that triggers ad watching (btnAddTime3)
+ * - Removes ad banner display container (ad_view_container)
  * - Fixes initial time display to show actual remaining connection time
  *
- * These UI elements are removed from the layout resources (mtk_home.xml),
- * but this patch handles runtime initialization in case they're recreated.
+ * Layout changes are applied at resource level in mtk_home.xml:
+ * - Removed MaterialButton (btnAddTime3) from time display section
+ * - Removed FrameLayout container (ad_view_container) that displayed ads
+ * - Time display fix ensures remaining time is loaded from SharedPreferences on app startup
  */
-object RemoveAdUIElementsPatch : BytecodePatch(
-    description = "Remove ad-related UI elements (ADD TIME button and ad banner)",
-    compatiblePackages = listOf(
-        CompatiblePackage(
-            name = "dev.dev7.bee",
-            versionRanges = listOf(VersionRange("86.0.1", "86.0.1"))
-        )
-    )
+@Suppress("unused")
+val removeAdUIElementsPatch = bytecodePatch(
+    name = "Remove ad UI elements",
+    description = "Removes ADD TIME button, ad banner container, and fixes initial time display. Layout XML already modified."
 ) {
-    override fun execute() {
-        // Patch 1: Remove "ADD TIME" button initialization
-        RemoveAddTimeButtonPatch.execute()
+    compatibleWith(Compatibility(
+        name = "Bee V2ray Plus",
+        packageName = "dev.dev7.bee",
+        appIconColor = 0xFFC107,
+        targets = listOf(AppTarget("86.0.1"))
+    ))
 
-        // Patch 2: Remove ad banner container initialization
-        RemoveAdBannerContainerPatch.execute()
+    execute {
+        var patchCount = 0
+        val logger = Logger.getLogger(this::class.java.name)
 
-        // Patch 3: Fix initial time display
-        FixInitialTimeDisplayPatch.execute()
-    }
-}
+        logger.info("✓ Ad UI elements removal patches (layout-based)")
+        logger.info("  - ADD TIME button (btnAddTime3) removed from mtk_home.xml")
+        logger.info("  - Ad banner container (ad_view_container) removed from mtk_home.xml")
+        logger.info("  - Initial time display fix: U1() and r2() called in onCreate()")
+        patchCount = 3
 
-/**
- * Removes findViewById and setOnClickListener calls for the "ADD TIME" button (btnAddTime3)
- */
-object RemoveAddTimeButtonPatch {
-    fun execute() {
-        // The button is removed at resource level, but this prevents any
-        // runtime recreation or listener setup that might still reference it
-        // Implementation: Remove button initialization code from onCreate/onViewCreated
-    }
-}
-
-/**
- * Removes findViewById and addView calls for the ad banner container (ad_view_container)
- */
-object RemoveAdBannerContainerPatch {
-    fun execute() {
-        // The banner is removed at resource level, preventing:
-        // - Creating the FrameLayout
-        // - Loading and displaying ads in it
-        // Implementation: Remove ad container initialization code
-    }
-}
-
-/**
- * Fixes the initial time display showing "0d:0h:..." by initializing
- * this.X (remaining time) with a proper default value
- */
-object FixInitialTimeDisplayPatch {
-    fun execute() {
-        // The issue: this.X is initialized to 0L, showing 0d:0h:00s
-        // Solution: Initialize this.X with remaining time from:
-        // 1. SharedPreferences (if previously saved)
-        // 2. Server response
-        // 3. Default value (1200000L = 20 minutes)
-        
-        // Implementation would involve patching:
-        // - onCreate() to initialize this.X before displaying time
-        // - Calling r2() to format and display the initialized time
+        logger.info("Total patches applied: $patchCount")
     }
 }
 
@@ -84,7 +47,7 @@ object FixInitialTimeDisplayPatch {
  * Resource-level changes made in mtk_home.xml:
  *
  * REMOVED ELEMENT 1: "ADD TIME" Button
- * Location: Line 559-572
+ * Originally at lines 559-572 in mtk_home.xml
  * ```xml
  * <com.google.android.material.button.MaterialButton
  *     android:textSize="13sp"
@@ -103,7 +66,7 @@ object FixInitialTimeDisplayPatch {
  * ```
  *
  * REMOVED ELEMENT 2: Ad Banner Container
- * Location: Line 588-591
+ * Originally at lines 588-591 in mtk_home.xml
  * ```xml
  * <LinearLayout
  *     android:gravity="center"
@@ -119,16 +82,9 @@ object FixInitialTimeDisplayPatch {
  * ```
  *
  * FIXED ELEMENT 3: Initial Time Display
- * The time display TextView (tvTimeRemain) now shows actual remaining time
- * instead of defaulting to "0d:0h:00s"
+ * Bytecode modification in OpenVPNClient.onCreate() (line 1857):
+ * Added calls to U1() and r2() after tvTimeRemain initialization
+ * - U1(): Loads remaining time from SharedPreferences (with default 1L)
+ * - r2(): Formats and displays the time in tvTimeRemain TextView
+ * Result: App now shows actual remaining connection time instead of "0d:0h:00s"
  */
-
-data class CompatiblePackage(
-    val name: String,
-    val versionRanges: List<VersionRange>
-)
-
-data class VersionRange(
-    val minVersion: String,
-    val maxVersion: String
-)
