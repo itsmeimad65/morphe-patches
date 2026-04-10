@@ -6,8 +6,8 @@ import app.morphe.patcher.patch.Compatibility
 
 object Constants {
     val COMPATIBILITY_EXAMPLE = Compatibility(
-        name = "XYZ app",
-        packageName = "com.example.app",
+        name = "Itsmeimad65 Patches",
+        packageName = "com.itsmeimad65.app",
         apkFileType = ApkFileType.APK,
         appIconColor = 0xFF0045, // Icon color in Morphe Manager
         targets = listOf(
