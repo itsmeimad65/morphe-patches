@@ -1,4 +1,4 @@
-package app.template.patches.beev2rayplus.ads
+package app.itsmeimad65.patches.beev2rayplus.ads
 
 import app.morphe.patcher.Fingerprint
 import com.android.tools.smali.dexlib2.AccessFlags

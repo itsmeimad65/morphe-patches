@@ -1,6 +1,5 @@
-package app.template.patches.beev2rayplus.ui
+package app.itsmeimad65.patches.beev2rayplus.ui
 
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
@@ -25,7 +24,7 @@ val removeAdUIElementsPatch = bytecodePatch(
     compatibleWith(Compatibility(
         name = "Bee V2ray Plus",
         packageName = "dev.dev7.bee",
-        appIconColor = 0xFFC107,
+        appIconColor = 0x4CAF50,
         targets = listOf(AppTarget("86.0.1"))
     ))
 
